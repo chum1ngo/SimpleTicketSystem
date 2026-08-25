@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('tickets/', views.ticket_list_create, name='ticket_list_create'),
     path('tickets/<int:pk>/', views.ticket_details_update, name='ticket_details_update'),
+    path('tickets/<int:pk>/comments/', views.ticket_comments_read_create, name='ticket_comments_read_create'),
 ]
