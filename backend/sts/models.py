@@ -29,3 +29,13 @@ class Ticket(models.Model):
         default=TicketStatus.SIN_ASIGNAR,
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Comment(models.Model):
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
