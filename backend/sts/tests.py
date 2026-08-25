@@ -83,3 +83,25 @@ class CreateTicketViewTests(APITestCase):
         self.assertEqual(Ticket.objects.count(), 0)
         self.assertIn("priority", response.data)
 
+
+class TicketDetailsViewTests(APITestCase):
+    def setUp(self):
+        self.ticket = Ticket.objects.create(
+            title="Test Ticket",
+            description="Test description",
+            priority="LOW",
+        )
+
+    def test_returns_ticket_details(self):
+        response = self.client.get(f"/tickets/{self.ticket.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.ticket.id)
+        self.assertEqual(response.data["title"], "Test Ticket")
+        self.assertEqual(response.data["description"], "Test description")
+        self.assertEqual(response.data["priority"], "LOW")
+
+    def test_returns_404_for_nonexistent_ticket(self):
+        response = self.client.get("/tickets/999/")
+
+        self.assertEqual(response.status_code, 404)

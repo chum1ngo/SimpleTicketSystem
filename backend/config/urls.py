@@ -21,4 +21,5 @@ from sts import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tickets/', views.ticket_list_create, name='ticket_list_create'),
+    path('tickets/<int:pk>/', views.ticket_details, name='ticket_details'),
 ]

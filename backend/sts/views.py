@@ -16,3 +16,14 @@ def ticket_list_create(request):
         tickets = Ticket.objects.all()
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
+
+
+@api_view(["GET"])
+def ticket_details(request, pk):
+    try:
+        ticket = Ticket.objects.get(pk=pk)
+    except Ticket.DoesNotExist:
+        return Response({"error": "Ticket not found"}, status=404)
+
+    serializer = TicketSerializer(ticket)
+    return Response(serializer.data)
