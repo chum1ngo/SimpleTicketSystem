@@ -1,5 +1,10 @@
+from django.contrib.auth import get_user_model
+
+
 from rest_framework.test import APITestCase
+
 from .models import Ticket
+
 
 class TicketListViewTests(APITestCase):
     def test_returns_existing_tickets(self):
@@ -227,3 +232,22 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["content"], "Expected comment")
+
+
+class TicketAuthenticationTests(APITestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="test_user",
+            password="test_password",
+        )
+
+    def test_rejects_unauthenticated_request(self):
+        response = self.client.get("/tickets/")
+        self.assertEqual(response.status_code, 401)
+
+    def test_accepts_authenticated_request(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.get("/tickets/")
+
+        self.assertEqual(response.status_code, 200)
