@@ -1,9 +1,17 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.response import Response
-from .models import Ticket
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from .serializers import TicketSerializer, CommentSerializer
+from .models import Ticket
 
 @api_view(["GET", "POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def ticket_list_create(request):
     if request.method == "POST":
         serializer = TicketSerializer(data=request.data)
