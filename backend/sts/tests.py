@@ -110,6 +110,11 @@ class TicketDetailsViewTests(APITestCase):
             description="Test description",
             priority="LOW",
         )
+        self.user = get_user_model().objects.create_user(
+            username="test_user",
+            password="test_password",
+        )
+        self.client.force_authenticate(user=self.user)
 
     def test_returns_ticket_details(self):
         response = self.client.get(f"/tickets/{self.ticket.id}/")
@@ -133,6 +138,11 @@ class TicketStatusViewTests(APITestCase):
             description="Test description",
             priority="LOW"
         )
+        self.user = get_user_model().objects.create_user(
+            username="test_user",
+            password="test_password",
+        )
+        self.client.force_authenticate(user=self.user)
 
     def test_returns_ticket_initial_status(self):
         self.assertEqual(self.ticket.ticket_status, "SIN_ASIGNAR")
