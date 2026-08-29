@@ -27,6 +27,8 @@ def ticket_list_create(request):
 
 
 @api_view(["GET", "PATCH"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def ticket_details_update(request, pk):
     try:
         ticket = Ticket.objects.get(pk=pk)

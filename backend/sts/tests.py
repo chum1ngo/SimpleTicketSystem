@@ -263,5 +263,14 @@ class TicketAuthenticationTests(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         response = self.client.get("/tickets/")
-
         self.assertEqual(response.status_code, 200)
+
+    def test_rejects_unauthenticated_ticket_detail_request(self):
+        ticket = Ticket.objects.create(
+            title="Test Ticket",
+            description="Test description",
+            priority="LOW",
+        )
+
+        response = self.client.get(f"/tickets/{ticket.id}/")
+        self.assertEqual(response.status_code, 401)
