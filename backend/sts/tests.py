@@ -7,6 +7,13 @@ from .models import Ticket
 
 
 class TicketListViewTests(APITestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="test_user",
+            password="test_password",
+        )
+        self.client.force_authenticate(user=self.user)
+
     def test_returns_existing_tickets(self):
         Ticket.objects.create(
             title="Test Ticket",
@@ -22,6 +29,13 @@ class TicketListViewTests(APITestCase):
 
 
 class CreateTicketViewTests(APITestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="test_user",
+            password="test_password",
+        )
+        self.client.force_authenticate(user=self.user)
+
     def test_creates_new_ticket(self):
         response = self.client.post(
             "/tickets/",
