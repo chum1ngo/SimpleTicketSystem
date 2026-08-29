@@ -47,6 +47,8 @@ def ticket_details_update(request, pk):
         return Response(serializer.data)
 
 @api_view(["GET", "POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def ticket_comments_read_create(request, pk):
     try:
         ticket = Ticket.objects.get(pk=pk)

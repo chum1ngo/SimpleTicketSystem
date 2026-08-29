@@ -180,6 +180,11 @@ class TicketCommentViewTests(APITestCase):
             description="Ticket used to test comments",
             priority="MEDIUM",
         )
+        self.user = get_user_model().objects.create_user(
+            username="test_user",
+            password="test_password",
+        )
+        self.client.force_authenticate(user=self.user)
 
     def test_creates_comment_for_ticket(self):
         response = self.client.post(
@@ -223,6 +228,24 @@ class TicketCommentViewTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_rejects_unauthenticated_comment_list_request(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(f"/tickets/{self.ticket.id}/comments/")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_rejects_unauthenticated_comment_creation_request(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post(
+            f"/tickets/{self.ticket.id}/comments/",
+            {"content": "First comment"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 401)
 
     def test_returns_empty_comment_list(self):
         response = self.client.get(f"/tickets/{self.ticket.id}/comments/")
