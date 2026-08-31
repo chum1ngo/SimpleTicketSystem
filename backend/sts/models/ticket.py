@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 
 class Ticket(models.Model):
     class Priority(models.TextChoices):
@@ -28,14 +27,4 @@ class Ticket(models.Model):
         choices=TicketStatus.choices,
         default=TicketStatus.SIN_ASIGNAR,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-class Comment(models.Model):
-    ticket = models.ForeignKey(
-        Ticket,
-        on_delete=models.CASCADE,
-        related_name="comments",
-    )
-    content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
