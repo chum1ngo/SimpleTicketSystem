@@ -39,11 +39,16 @@ class TicketStatusViewTests(APITestCase):
             description="Test description",
             priority="LOW",
         )
+        self.staff_user = get_user_model().objects.create_user(
+            username="test_staff_user",
+            password="test_password",
+            is_staff=True,  # Make the user a staff member to test status updates
+        )
         self.user = get_user_model().objects.create_user(
             username="test_user",
             password="test_password",
         )
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.staff_user)
 
     def test_returns_ticket_initial_status(self):
         self.assertEqual(self.ticket.ticket_status, "SIN_ASIGNAR")
@@ -84,3 +89,17 @@ class TicketStatusViewTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_rejects_status_update_from_non_staff_user(self):
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.patch(
+            f"/tickets/{self.ticket.id}/",
+            {"ticket_status": "ASIGNADA"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.ticket_status, "SIN_ASIGNAR")
