@@ -110,3 +110,14 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["content"], "Expected comment")
+
+    def test_assigns_authenticated_user_as_comment_creator(self):
+        response = self.client.post(
+            f"/tickets/{self.ticket.id}/comments/",
+            {"content": "Comment with creator"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        comment = self.ticket.comments.get()
+        self.assertEqual(comment.created_by, self.user)
