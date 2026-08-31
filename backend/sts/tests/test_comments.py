@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from rest_framework.test import APITestCase
 
 from ..models import Ticket
@@ -121,3 +122,17 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         comment = self.ticket.comments.get()
         self.assertEqual(comment.created_by, self.user)
+
+    def test_assigns_developer_comment_type_from_user_group(self):
+        developer_group = Group.objects.create(name="Developer")
+        self.user.groups.add(developer_group)
+
+        response = self.client.post(
+            f"/tickets/{self.ticket.id}/comments/",
+            {"content": "Developer comment"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        comment = self.ticket.comments.get()
+        self.assertEqual(comment.comment_type, "DEVELOPER")
