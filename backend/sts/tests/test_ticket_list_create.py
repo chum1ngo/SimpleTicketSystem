@@ -99,3 +99,19 @@ class CreateTicketViewTests(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Ticket.objects.count(), 0)
         self.assertIn("priority", response.data)
+
+    def test_assigns_authenticated_user_as_ticket_creator(self):
+        response = self.client.post(
+            "/tickets/",
+            {
+                "title": "New Ticket",
+                "description": "New description",
+                "priority": "HIGH",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        ticket = Ticket.objects.get()
+        self.assertEqual(ticket.created_by, self.user)
