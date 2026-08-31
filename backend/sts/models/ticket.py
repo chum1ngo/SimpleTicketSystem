@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -28,3 +29,10 @@ class Ticket(models.Model):
         default=TicketStatus.SIN_ASIGNAR,
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="tickets",
+        null=True,
+        blank=True,
+    )

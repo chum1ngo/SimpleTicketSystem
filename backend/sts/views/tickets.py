@@ -19,7 +19,7 @@ def ticket_list_create(request):
     if request.method == "POST":
         serializer = TicketSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(created_by=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
