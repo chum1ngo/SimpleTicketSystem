@@ -27,5 +27,6 @@ class CommentSerializer(serializers.ModelSerializer):
             "content",
             "created_at",
             "created_by",
+            "comment_type",
         ]
-        read_only_fields = ["ticket", "created_at", "created_by"]
+        read_only_fields = ["ticket", "created_at", "created_by", "comment_type"]
