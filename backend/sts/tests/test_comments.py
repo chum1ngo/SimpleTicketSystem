@@ -136,3 +136,31 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         comment = self.ticket.comments.get()
         self.assertEqual(comment.comment_type, "DEVELOPER")
+
+    def test_assigns_qa_comment_type_from_user_group(self):
+        qa_group = Group.objects.create(name="QA")
+        self.user.groups.add(qa_group)
+
+        response = self.client.post(
+            f"/tickets/{self.ticket.id}/comments/",
+            {"content": "QA comment"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        comment = self.ticket.comments.get()
+        self.assertEqual(comment.comment_type, "QA")
+
+    def test_assigns_requester_comment_type_from_user_group(self):
+        requester_group = Group.objects.create(name="Requester")
+        self.user.groups.add(requester_group)
+
+        response = self.client.post(
+            f"/tickets/{self.ticket.id}/comments/",
+            {"content": "Requester comment"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        comment = self.ticket.comments.get()
+        self.assertEqual(comment.comment_type, "REQUESTER")
