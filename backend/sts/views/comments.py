@@ -28,6 +28,6 @@ def ticket_comments_read_create(request, pk):
     if request.method == "POST":
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(ticket=ticket)
+            serializer.save(ticket=ticket, created_by=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)

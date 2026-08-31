@@ -21,5 +21,11 @@ class TicketSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["id", "ticket", "content", "created_at"]
-        read_only_fields = ["ticket", "created_at"]
+        fields = [
+            "id",
+            "ticket",
+            "content",
+            "created_at",
+            "created_by",
+        ]
+        read_only_fields = ["ticket", "created_at", "created_by"]
