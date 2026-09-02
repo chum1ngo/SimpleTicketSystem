@@ -36,3 +36,10 @@ class Ticket(models.Model):
         null=True,
         blank=True,
     )
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="assigned_tickets",
+        null=True,
+        blank=True,
+    )
