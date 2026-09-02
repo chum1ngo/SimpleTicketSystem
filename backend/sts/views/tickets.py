@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from ..models import Ticket
 from ..serializers import TicketSerializer
-from ..permissions import IsStaffOrReadOnly
+from ..permissions import IsDeveloperOrQAOrReadOnly
 
 
 @api_view(["GET", "POST"])
@@ -31,7 +31,7 @@ def ticket_list_create(request):
 
 @api_view(["GET", "PATCH"])
 @authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated, IsStaffOrReadOnly])
+@permission_classes([IsAuthenticated, IsDeveloperOrQAOrReadOnly])
 def ticket_details_update(request, pk):
     try:
         ticket = Ticket.objects.get(pk=pk)

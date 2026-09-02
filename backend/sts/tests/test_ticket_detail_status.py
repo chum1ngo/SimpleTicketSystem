@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from rest_framework.test import APITestCase
 
 from ..models import Ticket
@@ -39,21 +40,22 @@ class TicketStatusViewTests(APITestCase):
             description="Test description",
             priority="LOW",
         )
-        self.staff_user = get_user_model().objects.create_user(
-            username="test_staff_user",
-            password="test_password",
-            is_staff=True,  # Make the user a staff member to test status updates
-        )
-        self.user = get_user_model().objects.create_user(
-            username="test_user",
+        self.developer_user = get_user_model().objects.create_user(
+            username="test_developer_user",
             password="test_password",
         )
-        self.client.force_authenticate(user=self.staff_user)
+        self.developer_user.groups.add(Group.objects.get(name="Developer"))
+        self.requester_user = get_user_model().objects.create_user(
+            username="test_requester_user",
+            password="test_password",
+        )
+        self.requester_user.groups.add(Group.objects.get(name="Requester"))
+        self.client.force_authenticate(user=self.developer_user)
 
     def test_returns_ticket_initial_status(self):
         self.assertEqual(self.ticket.ticket_status, "SIN_ASIGNAR")
 
-    def test_changes_ticket_status(self):
+    def test_developer_changes_ticket_status(self):
         self.assertEqual(self.ticket.ticket_status, "SIN_ASIGNAR")
 
         response = self.client.patch(
@@ -90,8 +92,26 @@ class TicketStatusViewTests(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_rejects_status_update_from_non_staff_user(self):
-        self.client.force_authenticate(user=self.user)
+    def test_qa_changes_ticket_status(self):
+        qa_user = get_user_model().objects.create_user(
+            username="test_qa_user",
+            password="test_password",
+        )
+        qa_user.groups.add(Group.objects.get(name="QA"))
+        self.client.force_authenticate(user=qa_user)
+
+        response = self.client.patch(
+            f"/tickets/{self.ticket.id}/",
+            {"ticket_status": "ASIGNADA"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.ticket_status, "ASIGNADA")
+
+    def test_rejects_status_update_from_requester(self):
+        self.client.force_authenticate(user=self.requester_user)
 
         response = self.client.patch(
             f"/tickets/{self.ticket.id}/",
