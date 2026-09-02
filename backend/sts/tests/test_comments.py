@@ -124,7 +124,7 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(comment.created_by, self.user)
 
     def test_assigns_developer_comment_type_from_user_group(self):
-        developer_group = Group.objects.create(name="Developer")
+        developer_group = Group.objects.get(name="Developer")
         self.user.groups.add(developer_group)
 
         response = self.client.post(
@@ -138,7 +138,7 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(comment.comment_type, "DEVELOPER")
 
     def test_assigns_qa_comment_type_from_user_group(self):
-        qa_group = Group.objects.create(name="QA")
+        qa_group = Group.objects.get(name="QA")
         self.user.groups.add(qa_group)
 
         response = self.client.post(
@@ -152,7 +152,7 @@ class TicketCommentViewTests(APITestCase):
         self.assertEqual(comment.comment_type, "QA")
 
     def test_assigns_requester_comment_type_from_user_group(self):
-        requester_group = Group.objects.create(name="Requester")
+        requester_group = Group.objects.get(name="Requester")
         self.user.groups.add(requester_group)
 
         response = self.client.post(
