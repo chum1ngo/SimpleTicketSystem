@@ -2,4 +2,7 @@ from django.apps import AppConfig
 
 
 class StsConfig(AppConfig):
-    name = 'sts'
+    name = "sts"
+
+    def ready(self):
+        from . import signals  # noqa: F401
