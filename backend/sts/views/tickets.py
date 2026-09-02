@@ -8,8 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ..models import Ticket
-from ..serializers import TicketSerializer
 from ..permissions import IsDeveloperOrQAOrReadOnly
+from ..serializers import TicketSerializer, TicketUpdateSerializer
+from ..services import InvalidAssigneeError, update_ticket
 
 
 @api_view(["GET", "POST"])
@@ -39,10 +40,20 @@ def ticket_details_update(request, pk):
         return Response({"error": "Ticket not found"}, status=404)
 
     if request.method == "PATCH":
-        serializer = TicketSerializer(ticket, data=request.data, partial=True)
+        serializer = TicketUpdateSerializer(
+            data=request.data,
+            partial=True,
+        )
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            try:
+                update_ticket(
+                    ticket=ticket,
+                    changes=serializer.validated_data,
+                )
+            except InvalidAssigneeError as error:
+                return Response({"assigned_to": [str(error)]}, status=400)
+
+            return Response(TicketSerializer(ticket).data)
         return Response(serializer.errors, status=400)
 
     if request.method == "GET":
